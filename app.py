@@ -19,6 +19,7 @@ from models import SearchHistory, User, db
 
 import os
 
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
 
@@ -39,6 +40,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL"
+)
 
 @login_manager.user_loader
 def load_user(user_id):
