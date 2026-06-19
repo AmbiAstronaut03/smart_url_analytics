@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #0f172a;
+            font-family: Inter, "Segoe UI", sans-serif;
+            color: #e2e8f0;
+        }
+        .auth-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 18px;
+        }
+        .auth-btn {
+            border-radius: 10px;
+        }
+        .form-control {
+            background: #0b1220;
+            color: #e2e8f0;
+            border: 1px solid #1f2937;
+        }
+        .form-control:focus {
+            background: #0b1220;
+            color: #e2e8f0;
+            box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.18);
+        }
+        a {
+            color: #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <main class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="auth-card mx-auto shadow-sm p-4 p-md-5" style="max-width: 420px; width: 100%;">
+            <div class="text-center mb-4">
+                <span class="badge bg-primary-subtle text-primary mb-2">🔐 Access Panel</span>
+                <h1 class="h3 mb-0">Login</h1>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} py-2" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 auth-btn">Login</button>
+            </form>
+
+            <p class="text-muted mt-3 mb-0 text-center">
+                New here?
+                <a href="{{ url_for('register') }}">Create an account</a>.
+            </p>
+        </div>
+    </main>
+</body>
+</html>
