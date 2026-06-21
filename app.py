@@ -13,12 +13,19 @@ from flask_login import (
 from sqlalchemy import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from api.traffic import analyze_domain
 from config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME, SECRET_KEY
 from models import SearchHistory, User, db
 
 import os
 
+print(DB_USERNAME)
+print(DB_PASSWORD)
+print(DB_NAME)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
@@ -40,9 +47,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URL"
-)
+
 
 @login_manager.user_loader
 def load_user(user_id):
