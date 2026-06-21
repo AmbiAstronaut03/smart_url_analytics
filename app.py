@@ -18,26 +18,38 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from api.traffic import analyze_domain
-from config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME, SECRET_KEY
+from config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME
 from models import SearchHistory, User, db
 
 import os
 
-print(DB_USERNAME)
-print(DB_PASSWORD)
-print(DB_NAME)
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = SECRET_KEY
+
+app.config["SECRET_KEY"] = os.getenv(
+    "SECRET_KEY",
+    "dev-secret-key-change-in-production"
+)
 
 database_url = os.getenv("DATABASE_URL")
+
 if database_url:
+    database_url = database_url.replace(
+        "postgres://",
+        "postgresql://",
+        1
+    )
+
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+
 else:
     encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
+
     app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"postgresql://{DB_USERNAME}:{encoded_password}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        f"postgresql://{DB_USERNAME}:{encoded_password}"
+        f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
+
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -83,9 +95,9 @@ def get_dashboard_context(result=None):
 with app.app_context():
     try:
         db.create_all()
-        print("Database tables initialized.")
+        print("✅ Database tables initialized.")
     except Exception as exc:
-        print(f"Failed to connect to database: {exc}")
+        print(f"❌ Failed to connect to database: {exc}")
 
 
 @app.route("/")
@@ -196,21 +208,7 @@ def logout():
     return redirect("/login")
 
 
-@app.route("/add-user")
-def add_user():
-    user = User(
-        username="kiran",
-        email="kiran@gmail.com",
-        password_hash=generate_password_hash("test123"),
-    )
 
-    try:
-        db.session.add(user)
-        db.session.commit()
-        return "User Added"
-    except Exception as exc:
-        db.session.rollback()
-        return f"Error: {str(exc)}"
 
 
 @app.route("/compare", methods=["GET", "POST"])
@@ -268,4 +266,7 @@ def export_csv():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
+    )
